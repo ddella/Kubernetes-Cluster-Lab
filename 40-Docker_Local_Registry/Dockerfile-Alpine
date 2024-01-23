@@ -1,0 +1,18 @@
+# dnsutils container with Alpine Linux 3.19.0
+
+# docker build -f Dockerfile-Alpine -t dnsutils2:2.0.0 .
+# docker run --rm -d --name dnsutils --hostname=dnsutils --env TZ='EAST+5EDT,M3.2.0/2,M11.1.0/2' --env TIMEZONE='America/New_York' dnsutils2:2.0.0
+# docker exec -it dnsutils dig -v
+# docker rm -f dnsutils
+
+FROM alpine:3.19.0
+
+LABEL org.opencontainers.image.authors="DDN <daniel@isociel.com>"
+LABEL version="1.00"
+LABEL Description="Lightweight container with tools to troubleshoot DNS in K8s"
+
+# Install dig& nslookup utilities
+RUN apk add --no-cache bind-tools
+
+CMD ["/bin/sh"]
+# ENTRYPOINT ["/bin/sh", "-c", "tail -f /dev/null"]

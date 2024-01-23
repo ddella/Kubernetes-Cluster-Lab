@@ -1,0 +1,50 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: v1
+data:
+  Corefile: |
+    .:53 {
+        errors
+        k8s_external k8s1-prod.kloud.lan
+        #rewrite stop {
+        #    name regex (.*)\.cluster\.lan {1}.cluster.local
+        #    answer name (.*)\.cluster\.local {1}.cluster.lan
+        #}
+        health {
+            lameduck 5s
+        }
+        ready
+        kubernetes cluster.local in-addr.arpa ip6.arpa {
+            pods insecure
+            fallthrough in-addr.arpa ip6.arpa
+            ttl 30
+        }
+        prometheus :9153
+        forward . /etc/resolv.conf
+        cache 30
+        loop
+        reload
+        loadbalance
+        acl k8s1-prod.kloud.lan {
+          allow net 192.168.13.10/32 192.168.13.11/32 192.168.13.12/32
+          block
+        }
+        acl {
+          allow type AXFR net 100.64.0.0/10 192.168.13.10/32 192.168.13.11/32 192.168.13.12/32
+          allow type IXFR net 100.64.0.0/10 192.168.13.10/32 192.168.13.11/32 192.168.13.12/32
+          block type AXFR net *
+          block type IXFR net *
+        }
+        transfer {
+          to *
+        }
+    }
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2023-11-17T23:30:24Z"
+  name: coredns
+  namespace: kube-system
+  resourceVersion: "1941444"
+  uid: 8bf7ef70-ee69-4965-bbe3-c76015eac484
